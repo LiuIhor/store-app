@@ -16,5 +16,4 @@ public class CartDto {
     private Long productId;
     @NotNull
     private Integer quantity;
-
 }

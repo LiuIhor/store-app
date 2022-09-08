@@ -2,81 +2,60 @@ package com.example.finalprojectstoreapp.services;
 
 import com.example.finalprojectstoreapp.dtos.ProductDto;
 import com.example.finalprojectstoreapp.exceptions.CustomException;
-import com.example.finalprojectstoreapp.exceptions.ProductNotExistException;
-import com.example.finalprojectstoreapp.mappers.ProductMapper;
 import com.example.finalprojectstoreapp.models.Product;
-import com.example.finalprojectstoreapp.repositories.ProductRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-public class ProductService {
-    private final ProductRepository productRepository;
+public interface ProductService {
 
-    public ProductDto createProduct(ProductDto productDto) {
-        Product product = ProductMapper.convertToEntity(productDto);
-        return ProductMapper.convertToDTO(productRepository.save(product));
-    }
+    /**
+     * Method to create product
+     *
+     * @param productDto This product to be created
+     * @return Created product
+     */
+    ProductDto createProduct(ProductDto productDto);
 
-    public List<ProductDto> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(ProductMapper::convertToDTO)
-                .collect(Collectors.toList());
-    }
+    /**
+     * Method to get all products
+     *
+     * @return List of products
+     */
+    List<ProductDto> getAllProducts();
 
-    public ProductDto updateProduct(ProductDto productDto) throws Exception {
-        if (!productRepository.existsById(productDto.getId())) {
-            throw new Exception("Product not present!");
-        }
-        Product product = ProductMapper.convertToEntity(productDto);
-        return ProductMapper
-                .convertToDTO(productRepository.save(product));
-    }
+    /**
+     * Method to update product
+     *
+     * @param productDto New updated product
+     * @return Updated product
+     * @throws CustomException if product not present in DB
+     */
+    ProductDto updateProduct(ProductDto productDto);
 
-    public void deleteProduct(Long productId) {
-        if (productRepository.existsById(productId)) {
-            productRepository.deleteById(productId);
-        }
-    }
+    /**
+     * Method to delete product
+     *
+     * @param productId id of the product to be deleted
+     */
+    void deleteProduct(Long productId);
 
-    public Product findById(Long productId) {
-        Optional<Product> product = productRepository.findById(productId);
-        if (product.isEmpty()) {
-            throw new ProductNotExistException("Product is invalid: " + productId);
-        }
-        return product.get();
-    }
 
-    public ProductDto decreaseAvailable(Long productId, Integer quantity) {
-        Optional<Product> product = productRepository.findById(productId);
-        if (product.isEmpty()) {
-            throw new ProductNotExistException("Product is invalid: " + productId);
-        }
+    /**
+     * Method to find product by id
+     *
+     * @param productId id of the product to be found
+     * @return Found product
+     */
+    Product findById(Long productId);
 
-        int newAvailable = product.get().getAvailable() - quantity;
 
-        if (newAvailable <= 0) {
-            throw new CustomException("Product not enough:" + productId);
-        }
-        product.get().setAvailable(newAvailable);
-        return ProductMapper.convertToDTO(productRepository.save(product.get()));
-    }
-
-    public ProductDto increaseAvailable(Long productId, Integer quantity) {
-        Optional<Product> product = productRepository.findById(productId);
-        if (product.isEmpty()) {
-            throw new ProductNotExistException("Product is invalid: " + productId);
-        }
-
-        int newAvailable = product.get().getAvailable() + quantity;
-
-        product.get().setAvailable(newAvailable);
-        return ProductMapper.convertToDTO(productRepository.save(product.get()));
-    }
+    /**
+     * Method to change available
+     *
+     * @param productId          Id of the product to be changed available
+     * @param quantity           Quantity products
+     * @param decreaseOrIncrease true - increases available, false - reduces available
+     * @return product wuth changed available
+     */
+    ProductDto changeAvailable(Long productId, Integer quantity, boolean decreaseOrIncrease);
 }

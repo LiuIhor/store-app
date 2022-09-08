@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 @Data
 @AllArgsConstructor
 public class DetailException {
+
     private final String massage;
     private final HttpStatus httpStatus;
     private final ZonedDateTime time;

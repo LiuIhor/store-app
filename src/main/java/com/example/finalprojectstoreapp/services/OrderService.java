@@ -1,74 +1,68 @@
 package com.example.finalprojectstoreapp.services;
 
-import com.example.finalprojectstoreapp.dtos.OrderDto;
+import com.example.finalprojectstoreapp.dtos.order.OrderDto;
 import com.example.finalprojectstoreapp.dtos.order.OrderListDto;
-import com.example.finalprojectstoreapp.dtos.order.OrderListItemDto;
-import com.example.finalprojectstoreapp.mappers.OrderMapper;
-import com.example.finalprojectstoreapp.models.Order;
-import com.example.finalprojectstoreapp.models.OrderStatus;
 import com.example.finalprojectstoreapp.models.User;
-import com.example.finalprojectstoreapp.repositories.OrderRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-public class OrderService {
+public interface OrderService {
 
-    private final OrderRepository orderRepository;
-    private final ProductService productService;
+    /**
+     * Method to get order`s items
+     *
+     * @param user Order owner
+     * @return list of Item
+     */
+    OrderListDto listOrderItems(User user);
 
-    public OrderListDto listOrderItems(User user) {
-        List<Order> orderList = orderRepository.findAllByUserOrderByCreatedDesc(user);
-        List<OrderListItemDto> orderItems = new ArrayList<>();
-        double totalCost = 0;
-        for (Order order : orderList) {
-            OrderListItemDto orderListItemDto = new OrderListItemDto(order);
-            totalCost += orderListItemDto.getQuantity() * order.getProduct().getPrice().doubleValue();
-            orderItems.add(orderListItemDto);
-        }
+    /**
+     * Method to finish all user`s order
+     *
+     * @param user Order owner
+     * @return List of changed orders
+     */
+    List<OrderDto> orderAllFinish(User user);
 
-        return new OrderListDto(orderItems, totalCost);
-    }
+    /**
+     * Method to cancel all user`s order
+     *
+     * @param user Order owner
+     * @return List of changed orders
+     */
+    List<OrderDto> orderAllCancel(User user);
 
-    public List<OrderDto> orderAllFinish(User user) {
-        List<Order> orderList = orderRepository.findAllByUserOrderByCreatedDesc(user);
+    /**
+     * Method to cancel user`s order
+     *
+     * @param user    Order owner
+     * @param orderId Id of the order to be canceled
+     * @return Order with status cancel
+     */
+    OrderDto orderCancel(User user, Long orderId);
 
-        orderList.forEach(order -> {
-            order.setStatus(OrderStatus.FINISHED);
-            orderRepository.save(order);
-        });
-        return orderList.stream()
-                .map(OrderMapper::convertToDTO).collect(Collectors.toList());
-    }
+    /**
+     * Method to finish user`s order
+     *
+     * @param user    Order owner
+     * @param orderId Id of the order to be finished
+     * @return Order with status finish
+     */
+    OrderDto orderFinish(User user, Long orderId);
 
-    public List<OrderDto> orderAllCancel(User user) {
-        List<Order> orderList = orderRepository.findAllByUserOrderByCreatedDesc(user);
-        orderList.forEach(order -> {
-            order.setStatus(OrderStatus.CANCELED);
-            productService.increaseAvailable(order.getProduct().getId(), order.getQuantity());
-            orderRepository.save(order);
-        });
-        return orderList.stream()
-                .map(OrderMapper::convertToDTO).collect(Collectors.toList());
-    }
+    /**
+     * Method to finish user`s order. Method for user with role Manager or Admin
+     *
+     * @param orderId Id of the order to be finished
+     * @return Order with status finish
+     */
+    OrderDto orderFinish(Long orderId);
 
-    public OrderDto orderCancel(User user, Long orderId) {
-        Order order = orderRepository.findByUserAndId(user, orderId);
-        order.setStatus(OrderStatus.CANCELED);
-        productService.increaseAvailable(order.getProduct().getId(), order.getQuantity());
-        orderRepository.save(order);
-        return OrderMapper.convertToDTO(order);
-    }
-
-    public OrderDto orderFinish(User user, Long orderId) {
-        Order order = orderRepository.findByUserAndId(user, orderId);
-        order.setStatus(OrderStatus.FINISHED);
-        orderRepository.save(order);
-        return OrderMapper.convertToDTO(order);
-    }
+    /**
+     * Method to cancel user`s order. Method for user with role Manager or Admin
+     *
+     * @param orderId Id of the order to be canceled
+     * @return Order with status cancel
+     */
+    OrderDto orderCancel(Long orderId);
 }

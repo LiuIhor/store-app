@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartListDto {
+
     private List<CartListItemDto> cartListItemListDto;
     private double totalCost;
 }

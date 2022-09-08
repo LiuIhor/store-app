@@ -1,14 +1,18 @@
-package com.example.finalprojectstoreapp.dtos;
+package com.example.finalprojectstoreapp.security.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class SignUpDto {
+@AllArgsConstructor
+public class SignupRequest {
+
     private String username;
     private String email;
+    private Set<String> roles;
     private String password;
 }

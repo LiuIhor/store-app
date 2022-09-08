@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductDto {
+
     private Long id;
     @NotNull
     private String title;

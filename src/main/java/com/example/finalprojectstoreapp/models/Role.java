@@ -1,12 +1,25 @@
 package com.example.finalprojectstoreapp.models;
 
-import org.springframework.security.core.GrantedAuthority;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public enum Role implements GrantedAuthority {
-    MANAGER, CLIENT;
+import javax.persistence.*;
 
-    @Override
-    public String getAuthority() {
-        return this.name();
-    }
+@Entity
+@Table(name = "roles")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Role {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private ERole name;
 }

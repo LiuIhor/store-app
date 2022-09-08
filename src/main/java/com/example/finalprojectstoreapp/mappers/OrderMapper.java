@@ -1,6 +1,6 @@
 package com.example.finalprojectstoreapp.mappers;
 
-import com.example.finalprojectstoreapp.dtos.OrderDto;
+import com.example.finalprojectstoreapp.dtos.order.OrderDto;
 import com.example.finalprojectstoreapp.models.Order;
 import lombok.experimental.UtilityClass;
 import org.modelmapper.ModelMapper;

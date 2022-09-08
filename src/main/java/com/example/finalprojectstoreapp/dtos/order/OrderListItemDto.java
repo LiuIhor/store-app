@@ -1,10 +1,8 @@
 package com.example.finalprojectstoreapp.dtos.order;
 
-import com.example.finalprojectstoreapp.models.Cart;
 import com.example.finalprojectstoreapp.models.Order;
 import com.example.finalprojectstoreapp.models.OrderStatus;
 import com.example.finalprojectstoreapp.models.Product;
-import com.example.finalprojectstoreapp.services.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderListItemDto {
-    private  Long id;
+
+    private Long id;
     private Integer quantity;
     private Product product;
     private OrderStatus orderStatus;

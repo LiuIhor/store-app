@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderListDto {
+
     private List<OrderListItemDto> orderListItemListDto;
     private double totalCost;
-
 }

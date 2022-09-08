@@ -3,9 +3,6 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
-    mvc:
-      pathmartch:
-        matching-strategy: ant_path_matcher
 
   datasource:
     url: jdbc:mysql://localhost:3306/store_app
@@ -13,3 +10,9 @@ spring:
     password: rootroot
   flyway:
     baseline-on-migrate: true
+app:
+  jwtSecret: MegaLargeSigningSecretKeyForDemoApplicationMegaLargeSigningSecretKeyForDemoApplication
+  jwtExpirationMs: 86400000
+
+server:
+  port: 8090

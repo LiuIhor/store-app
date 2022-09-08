@@ -2,85 +2,49 @@ package com.example.finalprojectstoreapp.services;
 
 import com.example.finalprojectstoreapp.dtos.cart.CartDto;
 import com.example.finalprojectstoreapp.dtos.cart.CartListDto;
-import com.example.finalprojectstoreapp.dtos.cart.CartListItemDto;
 import com.example.finalprojectstoreapp.exceptions.CustomException;
-import com.example.finalprojectstoreapp.mappers.CartMapper;
-import com.example.finalprojectstoreapp.models.*;
-import com.example.finalprojectstoreapp.repositories.CartRepository;
-import com.example.finalprojectstoreapp.repositories.OrderRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.example.finalprojectstoreapp.models.User;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+public interface CartService {
 
-@Service
-@RequiredArgsConstructor
-public class CartService {
+    /**
+     * Method to add product to cart
+     *
+     * @param cartDto Item in cart
+     * @param user    Cart owner
+     * @return added item from cart
+     */
+    CartDto addToCart(CartDto cartDto, User user);
 
-    private final ProductService productService;
-    private final CartRepository cartRepository;
-    private final OrderRepository orderRepository;
+    /**
+     * Method to get all items in cart
+     *
+     * @param user Cart owner
+     * @return List of items
+     */
+    CartListDto listCartItems(User user);
 
-    public CartDto addToCart(CartDto cartDto, User user) {
-        Product product = productService.findById(cartDto.getProductId());
+    /**
+     * Method to delete item from cart
+     *
+     * @param cartId Id item in cart
+     * @param user   Cart owner
+     */
+    void deleteCart(Long cartId, User user);
 
-        Cart cart = Cart.builder()
-                .product(product)
-                .user(user)
-                .quantity(cartDto.getQuantity())
-                .created(new Date())
-                .build();
-        return CartMapper.convertToDTO(cartRepository.save(cart));
-    }
+    /**
+     * Method to check cart
+     *
+     * @param user Cart owner
+     */
+    void checkout(User user);
 
-    public CartListDto listCartItems(User user) {
-        List<Cart> cartList = cartRepository.findAllByUserOrderByCreatedDesc(user);
-        List<CartListItemDto> cartItems = new ArrayList<>();
-        double totalCost = 0;
-        for (Cart cart : cartList) {
-            CartListItemDto cartListItemDto = new CartListItemDto(cart);
-            totalCost += cartListItemDto.getQuantity() * cart.getProduct().getPrice().doubleValue();
-            cartItems.add(cartListItemDto);
-        }
-
-        return new CartListDto(cartItems, totalCost);
-    }
-
-    public void deleteCart(Long cartId, User user) {
-        Optional<Cart> optionalCart = cartRepository.findById(cartId);
-
-        if (optionalCart.isEmpty()) {
-            throw new CustomException("Cart is invalid: " + cartId);
-        }
-
-        Cart cart = optionalCart.get();
-
-        if (cart.getUser() != user) {
-            throw new CustomException("Cart item does not belong to user: " + cartId);
-        }
-        cartRepository.delete(cart);
-    }
-
-    public void checkout(User user) {
-        cartRepository.findAllByUser(user)
-                .forEach(cart -> {
-                    Order order = new Order(cart);
-                    order.setStatus(OrderStatus.NEW);
-//                    cartRepository.delete(cart);
-                    productService.decreaseAvailable(cart.getProduct().getId(), cart.getQuantity());
-                    orderRepository.save(order);
-                });
-    }
-
-    public CartDto updateCart(CartDto cartDto) throws Exception {
-        if (!cartRepository.existsById(cartDto.getId())) {
-            throw new Exception("Cart not present!");
-        }
-        Cart cart = CartMapper.convertToEntity(cartDto);
-        return CartMapper
-                .convertToDTO(cartRepository.save(cart));
-    }
+    /**
+     * Method to update cart
+     *
+     * @param cartDto Updated cart
+     * @return New updated cart
+     * @throws CustomException If cart not present
+     */
+    CartDto updateCart(CartDto cartDto);
 }

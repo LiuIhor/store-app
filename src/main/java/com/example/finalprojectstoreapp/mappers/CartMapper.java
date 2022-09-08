@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 
 @UtilityClass
 public class CartMapper {
+
     private final ModelMapper modelMapper = new ModelMapper();
 
     public Cart convertToEntity(CartDto cartDto) {
